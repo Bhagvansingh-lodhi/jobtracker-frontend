@@ -14,48 +14,85 @@ import { api } from '@/lib/api';
 
 export interface Application {
   id: string;
+
   company: string;
+
   position: string;
+
   jobUrl?: string | null;
+
   location?: string | null;
-  salaryMin?: string | null;
-  salaryMax?: string | null;
+
+  salaryMin?: number | null;
+
+  salaryMax?: number | null;
+
   currency: string;
+
   jobType: string;
+
   status: string;
+
   appliedDate: string;
+
   deadline?: string | null;
+
   description?: string | null;
+
   createdAt: string;
+
   updatedAt: string;
 }
 
 export interface CreateApplicationData {
   company: string;
+
   position: string;
+
   jobUrl?: string;
+
   location?: string;
-  salaryMin?: string;
-  salaryMax?: string;
+
+  salaryMin?: number;
+
+  salaryMax?: number;
+
   currency?: string;
+
   jobType?: string;
+
   status?: string;
+
   appliedDate: string;
+
   deadline?: string;
+
   description?: string;
 }
 
 export interface UpdateApplicationData {
   company?: string;
+
   position?: string;
+
   jobUrl?: string;
+
   location?: string;
-  salaryMin?: string;
-  salaryMax?: string;
+
+  salaryMin?: number;
+
+  salaryMax?: number;
+
   currency?: string;
+
   jobType?: string;
+
+  status?: string;
+
   appliedDate?: string;
+
   deadline?: string;
+
   description?: string;
 }
 
@@ -94,7 +131,10 @@ export function useApplication(
   id: string,
 ) {
   return useQuery<Application>({
-    queryKey: ['applications', id],
+    queryKey: [
+      'applications',
+      id,
+    ],
 
     queryFn: async () => {
       const response =
@@ -133,11 +173,15 @@ export function useCreateApplication() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['applications'],
+        queryKey: [
+          'applications',
+        ],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['dashboard'],
+        queryKey: [
+          'dashboard',
+        ],
       });
     },
   });
@@ -169,9 +213,14 @@ export function useUpdateApplication() {
       return response.data;
     },
 
-    onSuccess: (_, variables) => {
+    onSuccess: (
+      _data,
+      variables,
+    ) => {
       queryClient.invalidateQueries({
-        queryKey: ['applications'],
+        queryKey: [
+          'applications',
+        ],
       });
 
       queryClient.invalidateQueries({
@@ -182,7 +231,9 @@ export function useUpdateApplication() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['dashboard'],
+        queryKey: [
+          'dashboard',
+        ],
       });
     },
   });
@@ -216,9 +267,14 @@ export function useUpdateApplicationStatus() {
       return response.data;
     },
 
-    onSuccess: (_, variables) => {
+    onSuccess: (
+      _data,
+      variables,
+    ) => {
       queryClient.invalidateQueries({
-        queryKey: ['applications'],
+        queryKey: [
+          'applications',
+        ],
       });
 
       queryClient.invalidateQueries({
@@ -229,7 +285,9 @@ export function useUpdateApplicationStatus() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['dashboard'],
+        queryKey: [
+          'dashboard',
+        ],
       });
     },
   });
@@ -256,9 +314,14 @@ export function useDeleteApplication() {
       return response.data;
     },
 
-    onSuccess: (_, id) => {
+    onSuccess: (
+      _data,
+      id,
+    ) => {
       queryClient.invalidateQueries({
-        queryKey: ['applications'],
+        queryKey: [
+          'applications',
+        ],
       });
 
       queryClient.removeQueries({
@@ -269,7 +332,9 @@ export function useDeleteApplication() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['dashboard'],
+        queryKey: [
+          'dashboard',
+        ],
       });
     },
   });

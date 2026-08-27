@@ -59,6 +59,10 @@ export function ApplicationForm({
   const [error, setError] =
     useState('');
 
+  // ============================================================
+  // SUBMIT
+  // ============================================================
+
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>,
   ) {
@@ -66,19 +70,27 @@ export function ApplicationForm({
 
     setError('');
 
+    // ----------------------------------------------------------
+    // BASIC VALIDATION
+    // ----------------------------------------------------------
+
     if (!company.trim()) {
-      setError('Company is required.');
+      setError(
+        'Company is required.',
+      );
       return;
     }
 
     if (!position.trim()) {
-      setError('Position is required.');
+      setError(
+        'Position is required.',
+      );
       return;
     }
 
-    // ========================================================
-    // SALARY VALIDATION
-    // ========================================================
+    // ----------------------------------------------------------
+    // SALARY
+    // ----------------------------------------------------------
 
     const minSalary =
       salaryMin.trim() === ''
@@ -89,6 +101,10 @@ export function ApplicationForm({
       salaryMax.trim() === ''
         ? undefined
         : Number(salaryMax);
+
+    // ----------------------------------------------------------
+    // SALARY VALIDATION
+    // ----------------------------------------------------------
 
     if (
       minSalary !== undefined &&
@@ -123,6 +139,10 @@ export function ApplicationForm({
       return;
     }
 
+    // ----------------------------------------------------------
+    // CREATE
+    // ----------------------------------------------------------
+
     try {
       await createApplication.mutateAsync({
         company: company.trim(),
@@ -135,15 +155,9 @@ export function ApplicationForm({
         location:
           location.trim() || undefined,
 
-        // IMPORTANT:
-        // Backend expects numbers, not strings.
-        salaryMin: minSalary as
-          | number
-          | undefined,
+        salaryMin: minSalary,
 
-        salaryMax: maxSalary as
-          | number
-          | undefined,
+        salaryMax: maxSalary,
 
         currency: 'INR',
 
@@ -157,7 +171,8 @@ export function ApplicationForm({
           deadline || undefined,
 
         description:
-          description.trim() || undefined,
+          description.trim() ||
+          undefined,
       });
 
       onSuccess();
@@ -174,6 +189,10 @@ export function ApplicationForm({
     }
   }
 
+  // ============================================================
+  // UI
+  // ============================================================
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-xl">
@@ -181,7 +200,6 @@ export function ApplicationForm({
         {/* HEADER */}
 
         <div className="sticky top-0 flex items-center justify-between border-b bg-white px-6 py-4">
-
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
               Add Application
@@ -195,11 +213,13 @@ export function ApplicationForm({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            disabled={
+              createApplication.isPending
+            }
+            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
-
         </div>
 
         {/* FORM */}
@@ -208,7 +228,6 @@ export function ApplicationForm({
           onSubmit={handleSubmit}
           className="space-y-5 p-6"
         >
-
           {/* ERROR */}
 
           {error && (
@@ -217,9 +236,9 @@ export function ApplicationForm({
             </div>
           )}
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          {/* FIELDS */}
 
-            {/* COMPANY */}
+          <div className="grid gap-5 sm:grid-cols-2">
 
             <Field
               label="Company *"
@@ -229,8 +248,6 @@ export function ApplicationForm({
               required
             />
 
-            {/* POSITION */}
-
             <Field
               label="Position *"
               value={position}
@@ -238,8 +255,6 @@ export function ApplicationForm({
               placeholder="Software Engineer"
               required
             />
-
-            {/* JOB URL */}
 
             <Field
               label="Job URL"
@@ -249,16 +264,12 @@ export function ApplicationForm({
               type="url"
             />
 
-            {/* LOCATION */}
-
             <Field
               label="Location"
               value={location}
               onChange={setLocation}
               placeholder="Bangalore / Remote"
             />
-
-            {/* MINIMUM SALARY */}
 
             <Field
               label="Minimum Salary"
@@ -268,8 +279,6 @@ export function ApplicationForm({
               type="number"
               min="0"
             />
-
-            {/* MAXIMUM SALARY */}
 
             <Field
               label="Maximum Salary"
@@ -289,9 +298,9 @@ export function ApplicationForm({
 
               <select
                 value={jobType}
-                onChange={(e) =>
+                onChange={(event) =>
                   setJobType(
-                    e.target.value,
+                    event.target.value,
                   )
                 }
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-blue-500"
@@ -327,9 +336,9 @@ export function ApplicationForm({
 
               <select
                 value={status}
-                onChange={(e) =>
+                onChange={(event) =>
                   setStatus(
-                    e.target.value,
+                    event.target.value,
                   )
                 }
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-blue-500"
@@ -356,8 +365,6 @@ export function ApplicationForm({
               </select>
             </div>
 
-            {/* APPLIED DATE */}
-
             <Field
               label="Applied Date *"
               value={appliedDate}
@@ -366,15 +373,12 @@ export function ApplicationForm({
               required
             />
 
-            {/* DEADLINE */}
-
             <Field
               label="Deadline"
               value={deadline}
               onChange={setDeadline}
               type="date"
             />
-
           </div>
 
           {/* DESCRIPTION */}
@@ -386,15 +390,20 @@ export function ApplicationForm({
 
             <textarea
               value={description}
-              onChange={(e) =>
+              onChange={(event) =>
                 setDescription(
-                  e.target.value,
+                  event.target.value,
                 )
               }
               rows={4}
+              maxLength={10000}
               placeholder="Notes about this job..."
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+              className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
+
+            <div className="mt-1 text-right text-xs text-gray-400">
+              {description.length}/10000
+            </div>
           </div>
 
           {/* ACTIONS */}
@@ -407,7 +416,7 @@ export function ApplicationForm({
               disabled={
                 createApplication.isPending
               }
-              className="rounded-lg border px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-lg border px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancel
             </button>
@@ -419,7 +428,6 @@ export function ApplicationForm({
               }
               className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-
               {createApplication.isPending && (
                 <Loader2 className="h-4 w-4 animate-spin" />
               )}
@@ -427,11 +435,9 @@ export function ApplicationForm({
               {createApplication.isPending
                 ? 'Saving...'
                 : 'Add Application'}
-
             </button>
 
           </div>
-
         </form>
       </div>
     </div>
@@ -439,8 +445,18 @@ export function ApplicationForm({
 }
 
 // ============================================================
-// FIELD COMPONENT
+// FIELD
 // ============================================================
+
+interface FieldProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: string;
+  required?: boolean;
+  min?: string;
+}
 
 function Field({
   label,
@@ -450,15 +466,7 @@ function Field({
   type = 'text',
   required = false,
   min,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  type?: string;
-  required?: boolean;
-  min?: string;
-}) {
+}: FieldProps) {
   return (
     <div>
       <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -467,16 +475,16 @@ function Field({
 
       <input
         type={type}
+        value={value}
         required={required}
         min={min}
-        value={value}
-        onChange={(e) =>
+        onChange={(event) =>
           onChange(
-            e.target.value,
+            event.target.value,
           )
         }
         placeholder={placeholder}
-        className="h-11 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        className="h-11 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
       />
     </div>
   );
