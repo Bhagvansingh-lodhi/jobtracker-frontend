@@ -79,9 +79,7 @@ export function Sidebar({
   mobile = false,
 }: SidebarProps) {
   const pathname = usePathname();
-
-  const logout =
-    useLogout();
+  const logout = useLogout();
 
   async function handleLogout() {
     try {
@@ -97,21 +95,21 @@ export function Sidebar({
     <aside
       className={
         mobile
-          ? 'flex h-full w-full flex-col bg-white'
-          : 'fixed inset-y-0 left-0 z-40 hidden w-64 border-r bg-white lg:flex lg:flex-col'
+          ? 'flex h-full w-full flex-col bg-white/95 backdrop-blur-sm'
+          : 'fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-gray-200/80 bg-white/95 backdrop-blur-sm shadow-lg lg:flex lg:flex-col'
       }
     >
-
       {/* LOGO */}
-
       {!mobile && (
-        <div className="flex h-16 items-center border-b px-6">
+        <div className="flex h-16 items-center border-b border-gray-200/80 px-6">
           <Link
             href="/dashboard"
-            className="text-xl font-bold tracking-tight"
+            className="text-2xl font-bold tracking-tight text-gray-900 transition-all hover:scale-105"
           >
-            Job
-            <span className="text-blue-600">
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Job
+            </span>
+            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               Tracker
             </span>
           </Link>
@@ -119,35 +117,32 @@ export function Sidebar({
       )}
 
       {/* NAVIGATION */}
-
-      <nav className="flex-1 space-y-1 overflow-y-auto p-4">
-
+      <nav className="flex-1 space-y-0.5 overflow-y-auto p-4">
         <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
           Workspace
         </p>
 
         {navigation.map((item) => {
           const Icon = item.icon;
-
-          const active =
-            pathname === item.href ||
-            pathname.startsWith(
-              `${item.href}/`,
-            );
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+              className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                 active
-                  ? 'bg-blue-50 text-blue-600'
+                  ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <Icon className="h-5 w-5" />
-
-              {item.name}
+              {active && (
+                <span className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-blue-600 to-indigo-600"></span>
+              )}
+              <Icon className={`h-5 w-5 transition-colors ${
+                active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+              }`} />
+              <span className={active ? 'font-semibold' : ''}>{item.name}</span>
             </Link>
           );
         })}
@@ -156,61 +151,50 @@ export function Sidebar({
           Account
         </p>
 
-        {secondaryNavigation.map(
-          (item) => {
-            const Icon = item.icon;
+        {secondaryNavigation.map((item) => {
+          const Icon = item.icon;
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
-            const active =
-              pathname === item.href ||
-              pathname.startsWith(
-                `${item.href}/`,
-              );
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-                  active
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-
-                {item.name}
-              </Link>
-            );
-          },
-        )}
-
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                active
+                  ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              {active && (
+                <span className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-blue-600 to-indigo-600"></span>
+              )}
+              <Icon className={`h-5 w-5 transition-colors ${
+                active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+              }`} />
+              <span className={active ? 'font-semibold' : ''}>{item.name}</span>
+            </Link>
+          );
+        })}
       </nav>
 
       {/* LOGOUT */}
-
-      <div className="border-t p-4">
-
+      <div className="border-t border-gray-200/80 p-4">
         <button
           type="button"
           onClick={handleLogout}
           disabled={logout.isPending}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-60"
+          className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
-
           {logout.isPending ? (
             <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-5 w-5 transition-colors group-hover:text-red-600" />
           )}
-
-          {logout.isPending
-            ? 'Logging out...'
-            : 'Logout'}
-
+          <span className="transition-colors group-hover:text-red-600">
+            {logout.isPending ? 'Logging out...' : 'Logout'}
+          </span>
         </button>
-
       </div>
-
     </aside>
   );
 }
